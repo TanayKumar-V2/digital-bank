@@ -3,6 +3,8 @@ package com.neobank.auth_service.controller;
 import com.neobank.auth_service.dto.RegisterRequest;
 import com.neobank.auth_service.service.AuthenticationService;
 import jakarta.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,10 +18,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@Valid @RequestBody RegisterRequest request) {
-
-        return authenticationService.register(request);
-
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(authenticationService.register(request));
     }
 
 }

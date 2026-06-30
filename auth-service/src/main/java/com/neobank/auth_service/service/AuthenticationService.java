@@ -2,6 +2,7 @@ package com.neobank.auth_service.service;
 
 import com.neobank.auth_service.dto.RegisterRequest;
 import com.neobank.auth_service.entity.User;
+import com.neobank.auth_service.exception.EmailAlreadyExistsException;
 import com.neobank.auth_service.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,8 @@ public class AuthenticationService {
                 .toLowerCase();
 
         if (userRepository.findByEmail(normalizedEmail).isPresent()) {
-            throw new RuntimeException("Email already exists");
+            System.out.println("Duplicate email detected");
+            throw new EmailAlreadyExistsException("Email already exists");
         }
 
         User user = new User(
