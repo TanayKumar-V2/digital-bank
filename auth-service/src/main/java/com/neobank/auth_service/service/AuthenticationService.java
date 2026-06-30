@@ -12,12 +12,15 @@ public class AuthenticationService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OtpService otpService;
 
     public AuthenticationService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            OtpService otpService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.otpService = otpService;
     }
 
     public String register(RegisterRequest request) {
@@ -43,8 +46,9 @@ public class AuthenticationService {
         );
         System.out.println(normalizedEmail);
         userRepository.save(user);
+        String otp = otpService.generateVerificationOtp(user);
 
-        return "Registration Successful";
+        return "Registration Successful"+otp;
 
     }
 
