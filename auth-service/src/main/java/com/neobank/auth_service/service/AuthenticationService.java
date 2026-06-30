@@ -4,15 +4,20 @@ import com.neobank.auth_service.dto.RegisterRequest;
 import com.neobank.auth_service.entity.User;
 import com.neobank.auth_service.exception.EmailAlreadyExistsException;
 import com.neobank.auth_service.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthenticationService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthenticationService(UserRepository userRepository) {
+    public AuthenticationService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public String register(RegisterRequest request) {
@@ -26,10 +31,16 @@ public class AuthenticationService {
             throw new EmailAlreadyExistsException("Email already exists");
         }
 
-        User user = new User(
-                normalizedEmail,
+        String hashedPassword = passwordEncoder.encode(
                 request.getPassword());
 
+        User user = new User(
+
+                normalizedEmail,
+
+                hashedPassword
+
+        );
         System.out.println(normalizedEmail);
         userRepository.save(user);
 
