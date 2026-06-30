@@ -21,6 +21,15 @@ public class VerificationToken {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private VerificationType type;
+
+    @Column(nullable = false)
+    private Boolean used;
+
+     public VerificationToken() {}
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -34,5 +43,6 @@ public class VerificationToken {
 
         createdAt = LocalDateTime.now();
 
+        used=false;
     }
 }
