@@ -11,20 +11,31 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(
-            EmailAlreadyExistsException ex
-    ) {
+        @ExceptionHandler(EmailAlreadyExistsException.class)
+        public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(
+                        EmailAlreadyExistsException ex) {
 
-        ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                ex.getMessage()
-        );
+                ErrorResponse error = new ErrorResponse(
+                                LocalDateTime.now(),
+                                HttpStatus.CONFLICT.value(),
+                                HttpStatus.CONFLICT.getReasonPhrase(),
+                                ex.getMessage());
 
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(error);
-    }
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(error);
+        }
+
+        @ExceptionHandler(InvalidCredentialsException.class)
+        public ResponseEntity<ErrorResponse> handleInvalidCredentials(
+                        InvalidCredentialsException ex) {
+
+                ErrorResponse error = new ErrorResponse(
+                                LocalDateTime.now(),
+                                HttpStatus.UNAUTHORIZED.value(),
+                                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                                ex.getMessage());
+
+                return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
 }

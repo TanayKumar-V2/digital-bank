@@ -1,5 +1,7 @@
 package com.neobank.auth_service.controller;
 
+import com.neobank.auth_service.dto.LoginRequest;
+import com.neobank.auth_service.dto.LoginResponse;
 import com.neobank.auth_service.dto.RegisterRequest;
 import com.neobank.auth_service.dto.VerifyEmailRequest;
 import com.neobank.auth_service.service.AuthenticationService;
@@ -38,4 +40,11 @@ public class AuthController {
 
     }
 
+    @PostMapping("/login")
+    public LoginResponse login(
+            @Valid @RequestBody LoginRequest request) {
+
+        return authenticationService.login(request);
+
+    }
 }

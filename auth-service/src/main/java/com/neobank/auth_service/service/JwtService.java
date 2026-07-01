@@ -1,5 +1,6 @@
 package com.neobank.auth_service.service;
 
+import java.util.function.Function;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -38,6 +39,59 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSigningKey())
                 .compact();
+
+    }
+
+    public <T> T extractClaim(
+            String token,
+            Function<Claims, T> claimsResolver) {
+
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+
+    }
+
+    public String extractUsername(String token) {
+
+        return extractClaim(
+                token,
+                Claims::getSubject);
+
+    }
+
+    public Date extractExpiration(String token) {
+
+        return extractClaim(
+                token,
+                Claims::getExpiration);
+
+    }
+
+    private Claims extractAllClaims(String token) {
+
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+    }
+
+    private boolean isTokenExpired(String token) {
+
+        return extractExpiration(token)
+                .before(new Date());
+
+    }
+
+    public boolean isTokenValid(
+            String token,
+            User user) {
+
+        final String email = extractUsername(token);
+
+        return email.equals(user.getEmail())
+                && !isTokenExpired(token);
 
     }
 }

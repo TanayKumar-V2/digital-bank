@@ -20,6 +20,22 @@ public class User {
 
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Role getRole() {
         return role;
     }
@@ -43,6 +59,8 @@ public class User {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+        this.emailVerified = false;
+        this.role = Role.CUSTOMER;
     }
 
     public String getEmail() {
