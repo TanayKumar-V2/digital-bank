@@ -17,6 +17,14 @@ public class User {
 
     }
 
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
     public User(String email, String password) {
         this.email = email;
         this.password = password;

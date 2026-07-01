@@ -42,6 +42,14 @@ public class VerificationToken {
         this.type = type;
     }
 
+    public Boolean getUsed() {
+        return used;
+    }
+
+    public void setUsed(Boolean used) {
+        this.used = used;
+    }
+
     @Id
     private UUID id;
 
