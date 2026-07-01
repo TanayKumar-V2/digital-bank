@@ -4,10 +4,13 @@ import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Null;
+import com.neobank.auth_service.entity.enums.Role;
 
 @Entity
 @Table(name = "users")
@@ -16,6 +19,18 @@ public class User {
     public User() {
 
     }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     public Boolean getEmailVerified() {
         return emailVerified;
@@ -28,6 +43,14 @@ public class User {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     @Id
