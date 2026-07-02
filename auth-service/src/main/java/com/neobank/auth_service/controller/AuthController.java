@@ -2,10 +2,12 @@ package com.neobank.auth_service.controller;
 
 import com.neobank.auth_service.dto.LoginRequest;
 import com.neobank.auth_service.dto.LoginResponse;
+import com.neobank.auth_service.dto.RefreshTokenRequest;
 import com.neobank.auth_service.dto.RegisterRequest;
 import com.neobank.auth_service.dto.VerifyEmailRequest;
 import com.neobank.auth_service.service.AuthenticationService;
 import com.neobank.auth_service.service.OtpService;
+import com.neobank.auth_service.service.RefreshTokenService;
 
 import jakarta.validation.Valid;
 
@@ -18,13 +20,16 @@ public class AuthController {
 
     private final AuthenticationService authenticationService;
     private final OtpService otpService;
+    private final RefreshTokenService refreshTokenService;
 
     public AuthController(
             AuthenticationService authenticationService,
-            OtpService otpService) {
+            OtpService otpService,
+            RefreshTokenService refreshTokenService) {
 
         this.authenticationService = authenticationService;
         this.otpService = otpService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/register")
@@ -45,6 +50,15 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request) {
 
         return authenticationService.login(request);
-
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refreshToken(
+            @Valid @RequestBody RefreshTokenRequest request) {
+
+        LoginResponse response = refreshTokenService.refresh(request);
+
+        return ResponseEntity.ok(response);
+    }
+
 }
