@@ -14,75 +14,83 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final OtpService otpService;
-    private final JwtService jwtService;
+        private final UserRepository userRepository;
+        private final PasswordEncoder passwordEncoder;
+        private final OtpService otpService;
+        private final JwtService jwtService;
+        private final RefreshTokenService refreshTokenService;
 
-    public AuthenticationService(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            OtpService otpService,
-            JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.otpService = otpService;
-        this.jwtService = jwtService;
-    }
-
-    public String register(RegisterRequest request) {
-
-        String normalizedEmail = request.getEmail()
-                .trim()
-                .toLowerCase();
-
-        if (userRepository.findByEmail(normalizedEmail).isPresent()) {
-            System.out.println("Duplicate email detected");
-            throw new EmailAlreadyExistsException("Email already exists");
+        public AuthenticationService(
+                        UserRepository userRepository,
+                        PasswordEncoder passwordEncoder,
+                        OtpService otpService,
+                        JwtService jwtService,
+                        RefreshTokenService refreshTokenService) {
+                this.userRepository = userRepository;
+                this.passwordEncoder = passwordEncoder;
+                this.otpService = otpService;
+                this.jwtService = jwtService;
+                this.refreshTokenService = refreshTokenService;
         }
 
-        String hashedPassword = passwordEncoder.encode(
-                request.getPassword());
+        public String register(RegisterRequest request) {
 
-        User user = new User();
+                String normalizedEmail = request.getEmail()
+                                .trim()
+                                .toLowerCase();
 
-        user.setEmail(normalizedEmail);
-        user.setPassword(hashedPassword);
-        user.setEmailVerified(false);
-        user.setRole(Role.CUSTOMER);
-        userRepository.save(user);
-        String otp = otpService.generateVerificationOtp(user);
+                if (userRepository.findByEmail(normalizedEmail).isPresent()) {
+                        System.out.println("Duplicate email detected");
+                        throw new EmailAlreadyExistsException("Email already exists");
+                }
 
-        return "Registration Successful" + otp;
+                String hashedPassword = passwordEncoder.encode(
+                                request.getPassword());
 
-    }
+                User user = new User();
 
-    public LoginResponse login(LoginRequest request) {
+                user.setEmail(normalizedEmail);
+                user.setPassword(hashedPassword);
+                user.setEmailVerified(false);
+                user.setRole(Role.CUSTOMER);
+                userRepository.save(user);
+                String otp = otpService.generateVerificationOtp(user);
 
-        String normalizedEmail = request.getEmail()
-                .trim()
-                .toLowerCase();
+                return "Registration Successful" + otp;
 
-        User user = userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new InvalidCredentialsException(
-                        "Invalid email or password"));
-
-        if (!user.getEmailVerified()) {
-            throw new InvalidCredentialsException(
-                    "Please verify your email first.");
         }
 
-        boolean valid = passwordEncoder.matches(
-                request.getPassword(),
-                user.getPassword());
+        public LoginResponse login(LoginRequest request) {
 
-        if (!valid) {
-            throw new InvalidCredentialsException(
-                    "Invalid email or password");
+                String normalizedEmail = request.getEmail()
+                                .trim()
+                                .toLowerCase();
+
+                User user = userRepository.findByEmail(normalizedEmail)
+                                .orElseThrow(() -> new InvalidCredentialsException(
+                                                "Invalid email or password"));
+
+                if (!user.getEmailVerified()) {
+                        throw new InvalidCredentialsException(
+                                        "Please verify your email first.");
+                }
+
+                boolean valid = passwordEncoder.matches(
+                                request.getPassword(),
+                                user.getPassword());
+
+                if (!valid) {
+                        throw new InvalidCredentialsException(
+                                        "Invalid email or password");
+                }
+
+                String accessToken = jwtService.generateToken(user);
+
+                String refreshToken = refreshTokenService.generateRefreshToken(user);
+
+                return new LoginResponse(
+                                accessToken,
+                                refreshToken,
+                                "Bearer");
         }
-
-        String token = jwtService.generateToken(user);
-
-        return new LoginResponse(token, "Bearer");
-    }
 }
